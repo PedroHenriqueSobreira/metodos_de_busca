@@ -1,0 +1,114 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_PRODUTOS 12
+
+struct Produto {
+    int codigo;
+    char descricao[100];
+    float preco;
+};
+
+void cadastrarProdutos(struct Produto produtos[]) {
+    printf("Cadastro de produtos:\n");
+    for (int i = 0; i < MAX_PRODUTOS; i++) {
+        printf("Produto %d:\n", i + 1);
+        printf("Código: ");
+        scanf("%d", &produtos[i].codigo);
+        getchar(); // Limpar o buffer do teclado
+
+        printf("Descrição: ");
+        fgets(produtos[i].descricao, sizeof(produtos[i].descricao), stdin);
+        produtos[i].descricao[strcspn(produtos[i].descricao, "\n")] = '\0'; // Remover o \n do final
+
+        printf("Preço: ");
+        scanf("%f", &produtos[i].preco);
+        getchar(); // Limpar o buffer do teclado
+        printf("\n");
+    }
+}
+
+void ordenarProdutos(struct Produto produtos[]) {
+    for (int i = 0; i < MAX_PRODUTOS - 1; i++) {
+        int min_index = i;
+        for (int j = i + 1; j < MAX_PRODUTOS; j++) {
+            if (produtos[j].codigo < produtos[min_index].codigo) {
+                min_index = j;
+            }
+        }
+
+        if (min_index != i) {
+            struct Produto temp = produtos[i];
+            produtos[i] = produtos[min_index];
+            produtos[min_index] = temp;
+        }
+    }
+}
+
+int buscaSequencial(struct Produto produtos[], int codigo, int *comparacoes) {
+    for (int i = 0; i < MAX_PRODUTOS; i++) {
+        (*comparacoes)++;
+        if (produtos[i].codigo == codigo) {
+            return i; // Retorna o índice do produto encontrado
+        }
+    }
+    return -1; // Retorna -1 se o produto não foi encontrado
+}
+
+int buscaBinaria(struct Produto produtos[], int codigo, int *comparacoes) {
+    int esquerda = 0;
+    int direita = MAX_PRODUTOS - 1;
+    
+    while (esquerda <= direita) {
+        (*comparacoes)++;
+        int meio = (esquerda + direita) / 2;
+        if (produtos[meio].codigo == codigo) {
+            return meio; // Retorna o índice do produto encontrado
+        } else if (produtos[meio].codigo < codigo) {
+            esquerda = meio + 1; // Busca na metade direita
+        } else {
+            direita = meio - 1; // Busca na metade esquerda
+        }
+    }
+    return -1; // Retorna -1 se o produto não foi encontrado
+}
+
+int main() {
+    struct Produto produtos[MAX_PRODUTOS];
+    int codigo_busca;
+    int posicao;
+    int comparacoes_sequencial = 0;
+    int comparacoes_binaria = 0;
+
+    // Passo 1: Cadastro dos produtos
+    cadastrarProdutos(produtos);
+
+    // Passo 2: Ordenação dos produtos pelo código
+    ordenarProdutos(produtos);
+
+    // Passo 3: Busca sequencial
+    printf("Digite o código do produto para busca sequencial: ");
+    scanf("%d", &codigo_busca);
+    posicao = buscaSequencial(produtos, codigo_busca, &comparacoes_sequencial);
+
+    if (posicao != -1) {
+        printf("Produto encontrado na posição %d.\n", posicao);
+    } else {
+        printf("Produto não encontrado.\n");
+    }
+    printf("Número de comparações na busca sequencial: %d\n", comparacoes_sequencial);
+
+    // Passo 4: Busca binária
+    printf("\nDigite o código do produto para busca binária: ");
+    scanf("%d", &codigo_busca);
+    posicao = buscaBinaria(produtos, codigo_busca, &comparacoes_binaria);
+
+    if (posicao != -1) {
+        printf("Produto encontrado na posição %d.\n", posicao);
+    } else {
+        printf("Produto não encontrado.\n");
+    }
+    printf("Número de comparações na busca binária: %d\n", comparacoes_binaria);
+
+    return 0;
+}
