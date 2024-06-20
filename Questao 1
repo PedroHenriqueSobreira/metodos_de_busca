@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_CONVIDADOS 100
+#define TAM_NOME 50
+
+void obter_lista_convidados(char lista_convidados[MAX_CONVIDADOS][TAM_NOME], int *quantidade_convidados) {
+    char nome[TAM_NOME];
+    *quantidade_convidados = 0;
+
+    printf("Digite os nomes dos convidados. Digite 'fim' para terminar:\n");
+    while (1) {
+        printf("Convidado %d: ", *quantidade_convidados + 1);
+        fgets(nome, TAM_NOME, stdin);
+
+        nome[strcspn(nome, "\n")] = '\0';
+
+        if (strcmp(nome, "fim") == 0) {
+            break;
+        }
+
+        strcpy(lista_convidados[*quantidade_convidados], nome);
+        (*quantidade_convidados)++;
+
+        if (*quantidade_convidados >= MAX_CONVIDADOS) {
+            printf("Limite máximo de convidados atingido.\n");
+            break;
+        }
+    }
+}
+
+int pertence(char lista_convidados[MAX_CONVIDADOS][TAM_NOME], int quantidade_convidados, char *nome) {
+    for (int i = 0; i < quantidade_convidados; i++) {
+        if (strcmp(lista_convidados[i], nome) == 0) {
+            return 1;  // Nome encontrado na lista
+        }
+    }
+    return 0;  // Nome não encontrado na lista
+}
+
+int main() {
+    char lista_convidados[MAX_CONVIDADOS][TAM_NOME];
+    int quantidade_convidados;
+    char nome[TAM_NOME];
+
+    obter_lista_convidados(lista_convidados, &quantidade_convidados);
+
+    printf("Digite o nome a ser verificado: ");
+    fgets(nome, TAM_NOME, stdin);
+
+    nome[strcspn(nome, "\n")] = '\0';
+
+    if (pertence(lista_convidados, quantidade_convidados, nome)) {
+        printf("%s está na lista de convidados.\n", nome);
+    } else {
+        printf("%s não está na lista de convidados.\n", nome);
+    }
+
+    return 0;
+}
